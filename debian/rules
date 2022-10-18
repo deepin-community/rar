@@ -1,0 +1,53 @@
+#!/usr/bin/make -f
+
+
+build: build-arch build-indep
+build-arch: build-stamp
+build-indep: build-stamp
+
+build-stamp:
+	dh_testdir
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	rm -rf ./i386
+
+	dh_clean
+
+binary-indep: build
+
+binary-arch: build
+	dh_testdir
+	dh_testroot
+
+	dh_prep
+	dh_installdirs
+
+	mkdir ./i386
+	cp ./rar ./i386
+	cp ./default.sfx ./i386
+	install -o root -g root -s -m 0755 $(DEB_BUILD_ARCH)/rar debian/rar/usr/bin/rar
+
+	dh_installdocs
+	dh_installman debian/rar.1
+	dh_installchangelogs
+	dh_strip
+	dh_compress
+	install -o root -g root -m 0644 $(DEB_BUILD_ARCH)/default.sfx debian/rar/usr/lib/default.sfx
+	install -o root -g root -m 0644 rarfiles.lst debian/rar/etc/rarfiles.lst
+	install -o root -g root -m 644 debian/lintian debian/rar/usr/share/lintian/overrides/rar
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+source diff:
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

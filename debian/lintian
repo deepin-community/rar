@@ -1,0 +1,2 @@
+rar: extra-license-file usr/share/doc/rar/license.txt.gz
+rar: binary-file-compressed-with-upx ./usr/lib/default.sfx
